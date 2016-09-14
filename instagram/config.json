@@ -1,0 +1,9 @@
+{
+  "instagram": {
+    "clientId": "<YOUR_INSTAGRAM_API_KEY>",
+    "clientSecret": "<YOUR_INSTAGRAM_CLIENT_SECRET>"
+  },
+  "firebase": {
+    "apiKey": "<YOUR_FIREBASE_API_KEY>"
+  }
+}
