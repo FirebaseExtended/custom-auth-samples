@@ -3,7 +3,7 @@
 This repo contains samples that demonstrate how to Sign In Firebase using 3rd party auth providers.
 We currently have the following demos:
 
- - [Instagram](instagram)
+ - [Instagram](instagram) for Web
 
 
 ## Contributing
