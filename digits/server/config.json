@@ -1,8 +1,0 @@
-{
-  "digits": {
-    "consumerKey": "<YOUR_DIGITS_CONSUMER_KEY>"
-  },
-  "firebase": {
-    "apiKey": "<YOUR_FIREBASE_API_KEY>"
-  }
-}
