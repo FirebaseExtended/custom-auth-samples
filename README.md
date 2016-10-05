@@ -1,4 +1,4 @@
-# Sign In Firebase with 3rd Party auth providers samples
+# Samples: Sign In Firebase with additional auth providers using Custom auth tokens
 
 This repo contains samples that demonstrate how to use Custom auth tokens to Sign In Firebase with Identity Providers other than the ones with build-in support (Google, Facebook, Twitter and GitHub).
 We currently have the following samples:
