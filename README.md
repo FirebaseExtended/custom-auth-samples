@@ -1,7 +1,7 @@
 # Sign In Firebase with 3rd Party auth providers samples
 
-This repo contains samples that demonstrate how to Sign In Firebase using 3rd party auth providers.
-We currently have the following demos:
+This repo contains samples that demonstrate how to use Custom auth tokens to Sign In Firebase with Identity Providers other than the ones with build-in support (Google, Facebook, Twitter and GitHub).
+We currently have the following samples:
 
  - [Instagram](instagram) for Web
 
