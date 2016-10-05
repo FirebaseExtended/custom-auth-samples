@@ -1,4 +1,4 @@
-# Use Instagram In with Firebase
+# Use Instagram Sign In with Firebase
 
 This sample shows how to Sign in Firebase using [Instagram](https://www.instagram.com/developer/).
 
