@@ -18,8 +18,7 @@
 //  limitations under the License.
 
 #import "LineAuthManager.h"
-#import <LineAdapter/LineAdapter.h>
-#import <LineAdapterUI/LineAdapterUI.h>
+#import <LineAdapter/LineSDK.h>
 #import <GTMHTTPFetcher.h>
 #import "Constants.h"
 @import FirebaseAuth;
@@ -55,7 +54,7 @@
             // Authenticate with WebView
             UIViewController *viewController;
             viewController = [[LineAdapterWebViewController alloc] initWithAdapter:self.lineAdapter
-                                                            withWebViewOrientation:kOrientationAll];
+                                                            withWebViewOrientation:LineAdapterWebViewOrientationAll];
             [[viewController navigationItem] setLeftBarButtonItem:[LineAdapterNavigationController
                                                                    barButtonItemWithTitle:@"Cancel" target:self action:@selector(cancel:)]];
             UIViewController *navigationController;
@@ -166,7 +165,7 @@
     
     if (self) {
         // Initialize LINE Adapter
-        self.lineAdapter = [[LineAdapter alloc] initWithConfigFile];
+        self.lineAdapter = [LineAdapter defaultAdapter];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(lineAdapterAuthorizationDidChange:)
                                                      name:LineAdapterAuthorizationDidChangeNotification object:nil];
