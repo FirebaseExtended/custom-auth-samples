@@ -25,6 +25,7 @@ This sample shows how to Sign in Firebase using [LINE Login](https://developers.
  1. Create a Firebase project using the [Firebase Developer Console](https://console.firebase.google.com).
  1. **For the iOS app:** Go to **Firebase Console > Overview > Add Firebase to your iOS app** and create an app with the Bundle ID of `com.google.firebase.LINELoginDemo`. This will trigger your browser to download a `GoogleService-Info.plist` config file. Add this config file to your sample iOS app, then run `pod install` to make download necessary CocoaPods dependencies.
  1. **For the Android app:** Go to **Firebase Console > Overview > Add Firebase to your Android app** and create an app with the Package name of `com.google.firebase.linelogindemo`. This will trigger your browser to download a `google-services.json` config file. Add this config file to your sample Android app.
+ 	* If you have problem creating a your Android app, try changing the Android app's package name to your own value (e.g. `com.yourdomain.linelogindemo`) and try again. Remember to update the package name inside your Android app and in your LINE Channel's **Technical Configuration** page as well.
  1. **For the server:** Go to **Firebase Console > Settings > General**. Copy the `Web API Key` value and paste it in `server/app.json` as the value of `myFirebaseApiKey` in lieu of the placeholder.
 
 Create and provide a Service Account's keys:
