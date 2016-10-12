@@ -21,8 +21,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 
 /*** Configuration BEGIN ***/
-var myLINEChannelId = '<your_channel_id>';
-var myFirebaseApiKey = '<your_firebase_api_key>';
+var MY_LINE_CHANNEL_ID = '<your_channel_id>';
+var MY_FIREBASE_API_KEY = '<your_firebase_api_key>';
 /*** Configuration END ***/
 
 //Generate Firebase Custom Auth token
@@ -52,7 +52,7 @@ function updateUserProfile(lineAccessToken, firebaseToken, mid, callback) {
       // Create a Firebase app we'll use to authenticate as the user.
       var fbAppID = (new Date).getTime() + ":" + mid; //An unique ID for Firebase user app
       const userApp = firebase.initializeApp({
-        apiKey: myFirebaseApiKey,
+        apiKey: MY_FIREBASE_API_KEY,
       }, fbAppID);
 
       // Authenticate as the user.
@@ -110,7 +110,7 @@ app.post('/verifyToken', function(req, res) {
         // console.log(body);
         var lineObj = JSON.parse(body);
 
-        if ((typeof lineObj.mid != 'undefined') && (lineObj.channelId == myLINEChannelId)) {
+        if ((typeof lineObj.mid != 'undefined') && (lineObj.channelId == MY_LINE_CHANNEL_ID)) {
           // Access Token Validation succeed with LINE server
           // Generate Firebase token and return to device
           var firebaseToken = generateFirebaseToken(lineObj.mid);
