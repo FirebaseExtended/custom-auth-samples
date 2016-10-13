@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                         dialog.dismiss();
                         new AlertDialog.Builder(MainActivity.this)
                                 .setMessage(R.string.login_failed)
-                                .setPositiveButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {/* do nothing */}
                                 })
                                 .setIcon(android.R.drawable.ic_dialog_alert)
