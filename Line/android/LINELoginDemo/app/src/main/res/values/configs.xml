@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="validation_server_domain">your_line_token_verification_server</string>
+    <!-- Example: https://linelogindemo.appspot.com -->
+</resources>

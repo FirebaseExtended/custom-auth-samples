@@ -41,9 +41,9 @@ You can run it locally by running `npm run start` in a console, or deploy to the
 
 Then update your iOS and Android app with the address of your local machine:
  * iOS: In `Constant.h`, replace the placeholder text with your server domain.
- * Android: In `LineLoginUtils.java`, replace `LINE_ACCESSCODE_VERICATION_DOMAIN` constant value with your server domain.
+ * Android: In `configs.xml`, replace the placeholder text with your server domain.
 
-As your iOS / Android sample app will access the server from a real device or a simulator, please make sure that you will use the network address of your local server, not `http://localhost:8080`.
+As your iOS / Android sample app will access the server from a real device or a simulator, make sure that you use the network address of your local server, not `http://localhost:8080`.
 
 ### iOS, Android
 

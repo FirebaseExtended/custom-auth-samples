@@ -18,7 +18,7 @@ package com.google.firebase.linelogindemo.activity;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,10 +29,12 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.linelogindemo.R;
-import com.google.firebase.linelogindemo.util.LineLoginUtils;
+import com.google.firebase.linelogindemo.util.LineLoginHelper;
 import com.google.firebase.linelogindemo.util.NetworkSingleton;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,9 +45,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView mDisplayNameText;
     private NetworkImageView mProfileImageView;
 
-    // Network stack
+    // Helpers
     private ImageLoader mImageLoader;
-    final Handler mHandler = new Handler();
+    private LineLoginHelper mLineLoginHelper;
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         bindUIElements();
 
         mImageLoader = NetworkSingleton.getInstance(this).getImageLoader();
+        mLineLoginHelper = new LineLoginHelper(this);
         updateUI();
     }
 
@@ -83,45 +86,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void onTapLineLogin() {
+        // Show loading dialog
         final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.logging_in_using_line));
+        dialog.setCancelable(false);
         dialog.show();
 
-        LineLoginUtils.startLineLogin(this, new LineLoginUtils.LoginCallback() {
-            @Override
-            public void onSuccess() {
-                mHandler.post(new Runnable() {
+        // Kick start login progress
+        mLineLoginHelper
+                .startLineLogin()
+                .addOnSuccessListener(new OnSuccessListener<FirebaseUser>() {
                     @Override
-                    public void run() {
+                    public void onSuccess(FirebaseUser firebaseUser) {
+                        Log.d(TAG, "LINE Login was successful.");
+
                         updateUI();
                         dialog.dismiss();
                     }
-                });
-            }
-
-            @Override
-            public void onFail() {
-                mHandler.post(new Runnable() {
+                })
+                .addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void run() {
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "LINE Login failed. Error = " + e.getLocalizedMessage());
+
                         updateUI();
                         dialog.dismiss();
                         new AlertDialog.Builder(MainActivity.this)
-                                .setMessage("Login failed.")
+                                .setMessage(R.string.login_failed)
                                 .setPositiveButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                    // do nothing
-                                    }
+                                    public void onClick(DialogInterface dialog, int which) {/* do nothing */}
                                 })
                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                 .show();
                     }
                 });
-            }
-        });
     }
 
     void onTapLogout() {
-        LineLoginUtils.signOut();
+        mLineLoginHelper.signOut();
         updateUI();
     }
 

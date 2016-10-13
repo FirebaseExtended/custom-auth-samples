@@ -20,11 +20,9 @@ import android.app.Application;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.google.firebase.linelogindemo.util.LineLoginUtils;
+import com.google.firebase.linelogindemo.util.LineLoginHelper;
 
-import jp.line.android.sdk.LineSdkContext;
 import jp.line.android.sdk.LineSdkContextManager;
 
 public class LineLoginDemoApp extends Application {
@@ -56,8 +54,8 @@ public class LineLoginDemoApp extends Application {
         }
 
         // Verify if validation server URL has been setup
-        if (LineLoginUtils.LINE_ACCESSCODE_VERICATION_DOMAIN.contentEquals("<your_line_token_verification_server>")) {
-            throw new IllegalStateException("Please set your validation server domain in LineLoginUtils.java");
+        if (getString(R.string.validation_server_domain).contentEquals("your_line_token_verification_server")) {
+            throw new IllegalStateException("Please set your validation server domain in res/configs.xml");
         }
     }
 }
