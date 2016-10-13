@@ -66,7 +66,7 @@ app.post('/verifyToken', (req, res) => {
       const lineObj = JSON.parse(body);
 
       // Verify the token’s channelId match with my channelId to prevent spoof attack
-      if ((typeof lineObj.mid != 'undefined') && (lineObj.channelId == config.line.channelId)) {
+      if ((typeof lineObj.mid !== 'undefined') && (lineObj.channelId == config.line.channelId)) {
         // Access Token Validation succeed with LINE server
         // Generate Firebase token and return to device
         const firebaseToken = generateFirebaseToken(lineObj.mid);
