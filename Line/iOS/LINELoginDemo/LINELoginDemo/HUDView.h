@@ -21,7 +21,7 @@
 
 @interface HUDView : UIView
 
-+ (instancetype)generateToView:(UIView *)view;
++ (instancetype)addHUDViewToView:(UIView *)view;
 - (void)dismiss;
 
 @end

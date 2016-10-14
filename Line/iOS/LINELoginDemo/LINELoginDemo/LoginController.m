@@ -47,18 +47,13 @@
     [self updateUIWithUser:[[FIRAuth auth] currentUser]];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (IBAction)tappedLogin:(id)sender {
     // Prevent simultaneous call to LINE SDK
     if (self.isLoggingIn) return;
     
     // Start LINE Login...
     self.isLoggingIn = YES;
-    self.hudView = [HUDView generateToView:self.view];
+    self.hudView = [HUDView addHUDViewToView:self.view];
     
     __weak typeof(self) wSelf = self;
     [[LineAuthManager sharedInstance]

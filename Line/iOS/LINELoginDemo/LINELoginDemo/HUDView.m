@@ -25,10 +25,10 @@ static const CGFloat kLoadingViewCornerRadius = 6.0;
 
 @implementation HUDView
 
-+ (instancetype)generateToView:(UIView *)view {
++ (instancetype)addHUDViewToView:(UIView *)view {
     HUDView *hud = [[HUDView alloc] init];
     
-    UIView *loadingView = [self getLoadingView];
+    UIView *loadingView = [self loadingView];
     [hud addSubview:loadingView];
     hud.frame = view.bounds;
     loadingView.center = hud.center;
@@ -42,7 +42,7 @@ static const CGFloat kLoadingViewCornerRadius = 6.0;
     [self removeFromSuperview];
 }
 
-+ (UIView *)getLoadingView {
++ (UIView *)loadingView {
     // Create gray square in the centre
     CGRect fullFrame = CGRectMake(0, 0, kLoadingViewSize, kLoadingViewSize);
     UIView *view = [[UIView alloc] initWithFrame:fullFrame];

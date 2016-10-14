@@ -52,7 +52,7 @@
 		7FB4EB321DA50FA2006FE178 /* LineAdapter.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LineAdapter.plist; sourceTree = "<group>"; };
 		7FB4EB341DA5E82A006FE178 /* LineAuthManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LineAuthManager.h; sourceTree = "<group>"; };
 		7FB4EB351DA5E82A006FE178 /* LineAuthManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineAuthManager.m; sourceTree = "<group>"; };
-		7FB4EB3A1DA630B3006FE178 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		7FB4EB3A1DA630B3006FE178 /* Configs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Configs.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,9 +144,9 @@
 		7FB4EB391DA630A5006FE178 /* Configs */ = {
 			isa = PBXGroup;
 			children = (
-				7FB4EB321DA50FA2006FE178 /* LineAdapter.plist */,
-				7FB4EB3A1DA630B3006FE178 /* Constants.h */,
+				7FB4EB3A1DA630B3006FE178 /* Configs.h */,
 				7FB4EB1F1DA50D1B006FE178 /* GoogleService-Info.plist */,
+				7FB4EB321DA50FA2006FE178 /* LineAdapter.plist */,
 			);
 			name = Configs;
 			sourceTree = "<group>";

@@ -38,9 +38,12 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-        <!-- Disabling ATS to allow you test your server sample code without using a server -->
+        
+        <!-- Disabling ATS to allow you test your server sample code without using local machine. DON'T DO THIS IN YOUR PRODUCTION CODE -->
         <key>NSAllowsArbitraryLoads</key>
         <true/>
+        <!-- Disabling ATS to allow you test your server sample code without using local machine. DON'T DO THIS IN YOUR PRODUCTION CODE -->
+        
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>access.line.me</key>

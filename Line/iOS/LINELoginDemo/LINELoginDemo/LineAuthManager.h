@@ -23,10 +23,10 @@
 
 @interface LineAuthManager : NSObject
 
-+ (_Nonnull instancetype)sharedInstance;
++ (nonnull instancetype)sharedInstance;
 
 - (void)startLINELoginWithTopViewController:(UIViewController *_Nonnull)viewController
-                          completionHandler:(FIRAuthResultCallback _Nullable) callback;
+                          completionHandler:(nullable FIRAuthResultCallback) callback;
 
 - (void)signOut;
 

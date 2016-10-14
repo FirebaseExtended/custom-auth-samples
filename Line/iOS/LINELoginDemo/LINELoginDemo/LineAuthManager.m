@@ -20,7 +20,7 @@
 #import "LineAuthManager.h"
 #import <LineAdapter/LineSDK.h>
 #import <GTMHTTPFetcher.h>
-#import "Constants.h"
+#import "Configs.h"
 @import FirebaseAuth;
 
 @interface LineAuthManager ()
@@ -68,10 +68,10 @@
     [self.topViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)lineAdapterAuthorizationDidChange:(NSNotification*)aNotification {
-    LineAdapter *_adapter = [aNotification object];
-    if ([_adapter isAuthorized]) {
-        if (![self.lineAdapter canAuthorizeUsingLineApp]) {
+- (void)lineAdapterAuthorizationDidChange:(NSNotification *)notification {
+    LineAdapter *adapter = [notification object];
+    if ([adapter isAuthorized]) {
+        if (![adapter canAuthorizeUsingLineApp]) {
             // Authenticated using Webview, so need to dismiss the webview controller
             if (self.topViewController.presentedViewController) {
                 [self.topViewController dismissViewControllerAnimated:YES completion:nil];
@@ -80,13 +80,11 @@
         
         // Connection completed to LINE. Start step 2 validating LINE access token
         NSString *lineAccessToken = self.lineAdapter.getLineApiClient.accessToken;
-//        NSLog(@"DEBUG: LINE Access Token = %@",lineAccessToken);
         [self requestFirebaseAuthTokenWithLINEAccessToken:lineAccessToken];
     } else {
         // Return error to login callback
-        NSError *error = [[aNotification userInfo] objectForKey:@"error"];
-        if (error)
-        {
+        NSError *error = [[notification userInfo] objectForKey:@"error"];
+        if (error) {
             [self returnSignInResult:nil error:error];
         }
     }
@@ -100,7 +98,7 @@
     }
     
     // STEP 2: Exchange LINE access token for Firebase Custom Auth token
-    NSString *urlString = [NSString stringWithFormat:@"%@/verifyToken", YOUR_VALIDATION_SERVER_DOMAIN];
+    NSString *urlString = [NSString stringWithFormat:@"%@/verifyToken", kValidationServerDomain];
     NSURL *url = [NSURL URLWithString:urlString];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
@@ -112,13 +110,18 @@
                                                           options:kNilOptions error:&error];
     if (error) {
         [self returnSignInResult:nil error:error];
+        return;
     }
     [request setHTTPBody:requestBody];
     
     self.firebaseTokenFetcher = [GTMHTTPFetcher fetcherWithRequest:request];
-    self.firebaseTokenFetcher.allowedInsecureSchemes = @[@"http"]; // Allow fetching http so that you can run your server sample code locally without https
-    __weak typeof(self) wSelf = self;
+#ifdef DEBUG
+    // Allow fetching http so that you can run your server sample code locally without https.
+    // However, please remember to remove this line, as weel as "Allow Insecure Loads" entry in the Info.plist in your production code
+    self.firebaseTokenFetcher.allowedInsecureSchemes = @[@"http"];
+#endif
     
+    __weak typeof(self) wSelf = self;
     [self.firebaseTokenFetcher beginFetchWithCompletionHandler:^(NSData *data, NSError *error) {
         if (error) {
             [wSelf returnSignInResult:nil error:error];
@@ -126,7 +129,7 @@
             NSError *jsonSerializationError;
             NSDictionary *response = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonSerializationError];
             
-            if (error) {
+            if (jsonSerializationError) {
                 [wSelf returnSignInResult:nil error:jsonSerializationError];
             } else {
                 NSString *firebaseToken = response[@"firebase_token"];
@@ -152,7 +155,7 @@
 
 #pragma mark - Step 4: (Optional) Update user profile with LINE Profile
 - (void)updateUserProfile:(FIRUser *)user {
-    BOOL isProfileNeededUpdate = ([user.displayName length] == 0) || ([[user.photoURL absoluteString] length] == 0);
+    BOOL isProfileNeededUpdate = (user.displayName.length == 0) || (user.photoURL.absoluteString.length == 0);
     if (!isProfileNeededUpdate) {
         [self returnSignInResult:user error:nil];
     }
@@ -161,8 +164,8 @@
     __weak typeof(self) wSelf = self;
     [self.lineAdapter.getLineApiClient getMyProfileWithResultBlock:^(NSDictionary *aResult, NSError *aError) {
         if (aError) {
-            // Ignore LINE profile fetch error as this step is optional
-            [self returnSignInResult:user error:nil];
+            // As this step is optional in this sample, we don't return the error to the view controller
+            [wSelf returnSignInResult:user error:nil];
             return;
         }
         
@@ -173,7 +176,11 @@
             request.photoURL = [NSURL URLWithString:aResult[@"pictureUrl"]];
         }
         [request commitChangesWithCompletion:^(NSError * _Nullable error) {
-            // Ignore profile update error as this step is optional
+            if (error) {
+                // Handle error here
+            }
+            
+            // As this step is optional in this sample, we don't return the error to the view controller
             [wSelf returnSignInResult:user error:nil];
         }];
     }];
