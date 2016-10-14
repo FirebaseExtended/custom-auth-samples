@@ -47,11 +47,13 @@ app.use(bodyParser.json());
 // Verify LINE token and exchange for Firebase Custom Auth token
 app.post('/verifyToken', (req, res) => {
   if (req.body.token === undefined) {
-    return res.status(400).send('Access Token not found');
+    const ret = {
+      error_message: 'Access Token not found'
+    };
+    return res.status(400).send(ret);
   }
 
   const reqToken = req.body.token;
-  // console.log('LINE Access Token = ' + reqToken);
 
   // Send request to LINE server for access token verification
   const options = {
