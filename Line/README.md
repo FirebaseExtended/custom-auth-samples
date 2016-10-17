@@ -29,7 +29,8 @@ This sample shows how to Sign in Firebase using [LINE Login](https://developers.
  
 Create and provide a Service Account's keys:
  1. Create a Service Accounts file as described in the [Server SDK setup instructions](https://firebase.google.com/docs/server/setup#add_firebase_to_your_app).
- 1. Save the Service Account credential file as `service-account.json` and copy it to `server/`.
+ 1. Save the Service Account credential file as `service-account.json` and copy it to `server/`. 
+ (You should not check in this file to your repository as it contains secret key to grant full admin access to your Firebase account.)
 
 ## Run the sample
 

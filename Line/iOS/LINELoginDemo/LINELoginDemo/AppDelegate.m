@@ -54,12 +54,7 @@
     NSDictionary *linePlist = [[NSDictionary alloc] initWithContentsOfFile:linePlistPath];
     BOOL isLineSetupFinished = ![linePlist[@"ChannelId"] isEqualToString:@"<your_channel_id>"];
     NSAssert(isLineSetupFinished, @"Please update your LINE Channel ID in LineAdapter.plist");
-    
-    // Check if Firebase SDK has been setup
-    NSString *googleServicesPlistPath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-    BOOL isFirebaseSetupFinished = googleServicesPlistPath != nil;
-    NSAssert(isFirebaseSetupFinished, @"Please download GoogleService-Info.plist from Firebase Console and add to your project.");
-    
+        
     // Check if LINE access token validation server has been setup
     BOOL isServerSetupFinished = ![kValidationServerDomain isEqualToString:@"<your_line_token_verification_server>"];
     NSAssert(isServerSetupFinished, @"Please set your validation server domain in Configs.h");

@@ -21,8 +21,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import com.google.firebase.linelogindemo.util.LineLoginHelper;
-
 import jp.line.android.sdk.LineSdkContextManager;
 
 public class LineLoginDemoApp extends Application {

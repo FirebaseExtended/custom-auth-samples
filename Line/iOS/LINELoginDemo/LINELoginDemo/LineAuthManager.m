@@ -49,8 +49,7 @@
         if ([self.lineAdapter canAuthorizeUsingLineApp]) {
             // Authenticate with LINE application
             [self.lineAdapter authorize];
-        }
-        else {
+        } else {
             // Authenticate with WebView
             UIViewController *viewController;
             viewController = [[LineAdapterWebViewController alloc] initWithAdapter:self.lineAdapter

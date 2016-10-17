@@ -17,7 +17,6 @@
 package com.google.firebase.linelogindemo.activity;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,8 +28,8 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.linelogindemo.R;
@@ -48,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
     // Helpers
     private ImageLoader mImageLoader;
     private LineLoginHelper mLineLoginHelper;
+    private ProgressDialog mLoadingDialog;
 
-    private final String TAG = this.getClass().getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,37 +87,31 @@ public class MainActivity extends AppCompatActivity {
 
     void onTapLineLogin() {
         // Show loading dialog
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage(getString(R.string.logging_in_using_line));
-        dialog.setCancelable(false);
-        dialog.show();
+        mLoadingDialog = new ProgressDialog(this);
+        mLoadingDialog.setMessage(getString(R.string.logging_in_using_line));
+        mLoadingDialog.setCancelable(false);
+        mLoadingDialog.show();
 
         // Kick start login progress
         mLineLoginHelper
                 .startLineLogin()
-                .addOnSuccessListener(new OnSuccessListener<FirebaseUser>() {
+                .addOnCompleteListener(new OnCompleteListener<FirebaseUser>() {
                     @Override
-                    public void onSuccess(FirebaseUser firebaseUser) {
-                        Log.d(TAG, "LINE Login was successful.");
-
+                    public void onComplete(@NonNull Task<FirebaseUser> task) {
                         updateUI();
-                        dialog.dismiss();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "LINE Login failed. Error = " + e.getLocalizedMessage());
+                        mLoadingDialog.dismiss();
+                        mLoadingDialog = null;
 
-                        updateUI();
-                        dialog.dismiss();
-                        new AlertDialog.Builder(MainActivity.this)
-                                .setMessage(R.string.login_failed)
-                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {/* do nothing */}
-                                })
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .show();
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "LINE Login was successful.");
+                        } else {
+                            Log.e(TAG, "LINE Login failed. Error = " + task.getException().getLocalizedMessage());
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setMessage(R.string.login_failed)
+                                    .setNegativeButton(android.R.string.no, null)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .show();
+                        }
                     }
                 });
     }
@@ -148,4 +142,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // Dismiss loading dialog to avoid
+        if (mLoadingDialog != null) {
+            mLoadingDialog.dismiss();
+        }
+    }
 }

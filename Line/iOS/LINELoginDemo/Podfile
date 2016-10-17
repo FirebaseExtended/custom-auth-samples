@@ -6,6 +6,6 @@ target 'LINELoginDemo' do
   # use_frameworks!
 
   # Pods for LINELoginDemo
-  pod 'Firebase/Auth', '3.6.0'
+  pod 'Firebase/Auth', '3.7.1'
   pod 'GTMHTTPFetcher', '2.0.0'
 end

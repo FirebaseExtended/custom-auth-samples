@@ -55,7 +55,7 @@ import jp.line.android.sdk.model.Profile;
 public class LineLoginHelper {
 
     private String mLineAcessscodeVerificationEndpoint;
-    private static final String TAG = LineLoginHelper.class.getCanonicalName();
+    private static final String TAG = LineLoginHelper.class.getSimpleName();
 
     private Activity mActivity;
 
@@ -84,20 +84,21 @@ public class LineLoginHelper {
                         return getFirebaseAuthToken(mActivity, lineAccessCode);
                     }
                 })
-                .continueWithTask(new Continuation<String, Task<FirebaseUser>>() {
+                .continueWithTask(new Continuation<String, Task<AuthResult>>() {
                     @Override
-                    public Task<FirebaseUser> then(@NonNull Task<String> task) throws Exception {
+                    public Task<AuthResult> then(@NonNull Task<String> task) throws Exception {
                         // STEP 3: Use Firebase Custom Auth token to login Firebase
                         String firebaseToken = task.getResult();
-                        return loginWithFirebase(mActivity, firebaseToken);
+                        FirebaseAuth auth = FirebaseAuth.getInstance();
+                        return auth.signInWithCustomToken(firebaseToken);
                     }
                 })
-                .continueWithTask(new Continuation<FirebaseUser, Task<FirebaseUser>>() {
+                .continueWithTask(new Continuation<AuthResult, Task<FirebaseUser>>() {
                     @Override
-                    public Task<FirebaseUser> then(@NonNull Task<FirebaseUser> task) throws Exception {
+                    public Task<FirebaseUser> then(@NonNull Task<AuthResult> task) throws Exception {
                         // STEP 4: (Optional) Update user profile with LINE Profile
-                        FirebaseUser currentUser = task.getResult();
-                        return updateFirebaseUserProfile(mActivity, currentUser);
+                        FirebaseUser user = task.getResult().getUser();
+                        return updateFirebaseUserProfile(user);
                     }
                 });
 
@@ -124,7 +125,7 @@ public class LineLoginHelper {
                         Exception e = new Exception("User cancelled LINE Login.");
                         source.setException(e);
                         break;
-                    default: /* Error */ {
+                    default: // Error
                         Throwable cause = future.getCause();
                         if (cause instanceof LineSdkLoginException) {
                             LineSdkLoginException loginException = (LineSdkLoginException) cause;
@@ -133,7 +134,7 @@ public class LineLoginHelper {
                         } else {
                             source.setException(new Exception("Unknown error occurred in LINE SDK."));
                         }
-                    } break;
+                        break;
                 }
             }
         });
@@ -180,28 +181,7 @@ public class LineLoginHelper {
         return source.getTask();
     }
 
-    private Task<FirebaseUser> loginWithFirebase(Activity activity, String firebaseToken) {
-        final TaskCompletionSource<FirebaseUser> source = new TaskCompletionSource<>();
-
-        // STEP 3: Use Firebase Custom Auth token to login Firebase
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.signInWithCustomToken(firebaseToken)
-                .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCustomToken:onComplete:" + task.isSuccessful());
-                        if (task.isSuccessful()) {
-                            source.setResult(task.getResult().getUser());
-                        } else {
-                            source.setException(task.getException());
-                        }
-                    }
-                });
-
-        return source.getTask();
-    }
-
-    private Task<FirebaseUser> updateFirebaseUserProfile(Activity activity, final FirebaseUser user) {
+    private Task<FirebaseUser> updateFirebaseUserProfile(final FirebaseUser user) {
         final TaskCompletionSource<FirebaseUser> source = new TaskCompletionSource<>();
 
         // Check if we should use LINE profile to update Firebase profile

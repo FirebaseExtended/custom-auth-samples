@@ -1,17 +1,21 @@
 PODS:
-  - Firebase/Analytics (3.6.0):
-    - FirebaseAnalytics (= 3.4.2)
-  - Firebase/Auth (3.6.0):
-    - Firebase/Analytics
+  - Firebase/Auth (3.7.1):
+    - Firebase/Core
     - FirebaseAuth (= 3.0.5)
-  - FirebaseAnalytics (3.4.2):
+  - Firebase/Core (3.7.1):
+    - FirebaseAnalytics (= 3.4.4)
+    - FirebaseCore (= 3.4.3)
+  - FirebaseAnalytics (3.4.4):
+    - FirebaseCore (~> 3.4)
     - FirebaseInstanceID (~> 1.0)
     - GoogleInterchangeUtilities (~> 1.2)
     - GoogleSymbolUtilities (~> 1.1)
-    - GoogleUtilities (~> 1.2)
   - FirebaseAuth (3.0.5):
     - FirebaseAnalytics (~> 3.3)
     - GoogleNetworkingUtilities (~> 1.2)
+    - GoogleUtilities (~> 1.2)
+  - FirebaseCore (3.4.3):
+    - GoogleInterchangeUtilities (~> 1.2)
     - GoogleUtilities (~> 1.2)
   - FirebaseInstanceID (1.0.8)
   - GoogleInterchangeUtilities (1.2.2):
@@ -42,13 +46,14 @@ PODS:
     - GTMHTTPFetcher/Fetcher (= 2.0.0)
 
 DEPENDENCIES:
-  - Firebase/Auth (= 3.6.0)
+  - Firebase/Auth (= 3.7.1)
   - GTMHTTPFetcher (= 2.0.0)
 
 SPEC CHECKSUMS:
-  Firebase: 34187200ef4979dbd485c7aa685ef078bf587c86
-  FirebaseAnalytics: 3f5358d9104adf159cc8d99b7b501e50099a39ad
+  Firebase: be473484f0d515e72ffd04acf22f981773c23e58
+  FirebaseAnalytics: 0533a00b681e08fd0b2cd0444b7ddf0ef9fd7a1a
   FirebaseAuth: 75a062bbf2d3c97d1e6e55bbc110e13a6853e25d
+  FirebaseCore: 5a885548bbc5f0c410b04f8e9ac9d73ff1221907
   FirebaseInstanceID: ba1e640935235e5fac39dfa816fe7660e72e1a8a
   GoogleInterchangeUtilities: d5bc4d88d5b661ab72f9d70c58d02ca8c27ad1f7
   GoogleNetworkingUtilities: 3edd3a8161347494f2da60ea0deddc8a472d94cb
@@ -56,6 +61,6 @@ SPEC CHECKSUMS:
   GoogleUtilities: 8bbc733218aad26306f9d4a253823986110e3358
   GTMHTTPFetcher: a14e4ce88b3387be1cf569c24f316c3a7faeb43c
 
-PODFILE CHECKSUM: 28f2d82ff50525a6c25b625f4c547f62b5bba241
+PODFILE CHECKSUM: d9ed9c0cca80727dfbdcc832f46bae3c2a276444
 
 COCOAPODS: 1.0.1
