@@ -4,6 +4,7 @@ This repo contains samples that demonstrate how to use Custom auth tokens to Sig
 We currently have the following samples:
 
  - [Instagram](instagram) for Web
+ - [LINE Login](Line) for iOS & Android
 
 
 ## Contributing
