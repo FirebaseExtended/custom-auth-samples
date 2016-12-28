@@ -53,6 +53,7 @@ Demo.prototype.onAuthStateChanged = function(user) {
     this.instagramTokenRef = firebase.database().ref('/instagramAccessToken/' + user.uid);
     this.showInstagramPics();
   } else {
+    this.lastUid = null;
     this.picsContainer.innerHTML = '';
     this.signedOutCard.style.display = 'block';
     this.signedInCard.style.display = 'none';

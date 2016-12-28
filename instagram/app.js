@@ -24,10 +24,11 @@ const crypto = require('crypto');
 const config = require('./config.json');
 
 // Firebase Setup
-const firebase = require('firebase');
+const admin = require('firebase-admin');
 const serviceAccount = require('./service-account.json');
-firebase.initializeApp({
-  serviceAccount: serviceAccount
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
 });
 
 // Instagram OAuth 2 setup
@@ -107,11 +108,11 @@ app.get(OAUTH_CALLBACK_PATH, (req, res) => {
     const profilePic = results.user.profile_picture;
     const userName = results.user.full_name;
 
-    // Create a Firebase Custom Auth Token.
-    const firebaseToken = createFirebaseToken(instagramUserID);
-
-    // Serve an HTML page that signs the user in and updates the user profile.
-    res.send(signInFirebaseTemplate(firebaseToken, userName, profilePic, accessToken));
+    // Create a Firebase account and get the Custom Auth Token.
+    createFirebaseAccount(instagramUserID, userName, profilePic, accessToken).then(firebaseToken => {
+      // Serve an HTML page that signs the user in and updates the user profile.
+      res.send(signInFirebaseTemplate(firebaseToken, userName, profilePic, accessToken));
+    });
   });
 });
 
@@ -137,72 +138,72 @@ app.get(OAUTH_CODE_EXCHANGE_PATH, (req, res) => {
   }).then(results => {
     console.log('Auth code exchange result received:', results);
 
-    // Create a Firebase Custom Auth Token.
-    const firebaseToken = createFirebaseToken(results.user.id);
-
-    // Send the custom token, access token and profile data as a JSON object.
-    res.send({
-      firebaseCustomToken: firebaseToken,
-      instagramAccessToken: results.access_token,
-      photoURL: results.user.profile_picture,
-      displayName: results.user.full_name
+    // Create a Firebase Account and get the custom Auth Token.
+    createFirebaseAccount(results.user.id, results.user.full_name,
+        results.user.profile_picture, firebaseToken).then(firebaseToken => {
+      // Send the custom token, access token and profile data as a JSON object.
+      res.send(firebaseToken);
     });
   });
 });
 
 
 /**
- * Creates a Firebase custom auth token for the given Instagram user ID.
+ * Creates a Firebase account with the given user profile and returns a custom auth token allowing
+ * signing-in this account.
+ * Also saves the accessToken to the datastore at /instagramAccessToken/$uid
  *
- * @returns {Object} The Firebase custom auth token and the uid.
+ * @returns {Promise<string>} The Firebase custom auth token in a promise.
  */
-function createFirebaseToken(instagramID) {
+function createFirebaseAccount(instagramID, displayName, photoURL, accessToken) {
   // The UID we'll assign to the user.
   const uid = `instagram:${instagramID}`;
 
-  // Create the custom token.
-  const token = firebase.auth().createCustomToken(uid);
-  console.log('Created Custom token for UID "', uid, '" Token:', token);
-  return token;
+  // Save the access token tot he Firebase Realtime Database.
+  const databaseTask = admin.database().ref(`/instagramAccessToken/${uid}`)
+      .set(accessToken);
+
+  // Create or update the user account.
+  const userCreationTask = admin.auth().updateUser(uid, {
+    displayName: displayName,
+    photoURL: photoURL
+  }).catch(error => {
+    // If user does not exists we create it.
+    if (error.code === 'auth/user-not-found') {
+      return admin.auth().createUser({
+        uid: uid,
+        displayName: displayName,
+        photoURL: photoURL
+      });
+    }
+    throw error;
+  });
+
+  // Wait for all async task to complete then generate and return a custom auth token.
+  return Promise.all([userCreationTask, databaseTask]).then(() => {
+    // Create a Firebase custom auth token.
+    const token = admin.auth().createCustomToken(uid);
+    console.log('Created Custom token for UID "', uid, '" Token:', token);
+    return token;
+  });
 }
 
 /**
- * Generates the HTML template that:
- *  - Signs the user in Firebase using the given token
- *  - Updates the user profile (photoURL and displayName)
- *  - Saves the Instagram AccessToken to the Realtime Database
- *  - Closes the popup
+ * Generates the HTML template that signs the user in Firebase using the given token and closes the
+ * popup.
  */
-function signInFirebaseTemplate(token, displayName, photoURL, instagramAccessToken) {
+function signInFirebaseTemplate(token) {
   return `
-    <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase.js"></script>
-    <script src="promise.min.js"></script><!-- Promise Polyfill for older browsers -->
+    <script src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
     <script>
       var token = '${token}';
       var config = {
         apiKey: '${config.firebase.apiKey}',
         databaseURL: 'https://${serviceAccount.project_id}.firebaseio.com'
       };
-      // We sign in via a temporary Firebase app to update the profile.
-      var tempApp = firebase.initializeApp(config, '_temp_');
-      tempApp.auth().signInWithCustomToken(token).then(function(user) {
-
-        // Saving the Instagram API access token in the Realtime Database.
-        const tasks = [tempApp.database().ref('/instagramAccessToken/' + user.uid).set('${instagramAccessToken}')];
-
-        // Updating the displayname and photoURL if needed.
-        if ('${displayName}' !== user.displayName || '${photoURL}' !== user.photoURL) {
-          tasks.push(user.updateProfile({displayName: '${displayName}', photoURL: '${photoURL}'}));
-        }
-
-        // Wait for completion of above tasks.
-        return Promise.all(tasks).then(function() {
-          // Delete temporary Firebase app and sign in the default Firebase app, then close the popup.
-          var defaultApp = firebase.initializeApp(config);
-          Promise.all([tempApp.delete(), defaultApp.auth().signInWithCustomToken(token)]).then(function() {
-            window.close();
-          });
-        });
+      var app = firebase.initializeApp(config);
+      app.auth().signInWithCustomToken(token).then(function() {
+        window.close();
       });
     </script>`;
 }
