@@ -60,7 +60,6 @@ const OAUTH_SCOPES = 'basic';
 const app = express();
 app.use(express.static('public'));
 app.use(express.static('node_modules/instafeed.js'));
-app.use(express.static('node_modules/promise-polyfill'));
 app.use(cookieParser());
 
 /**
