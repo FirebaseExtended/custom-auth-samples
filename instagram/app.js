@@ -197,8 +197,7 @@ function signInFirebaseTemplate(token) {
     <script>
       var token = '${token}';
       var config = {
-        apiKey: '${config.firebase.apiKey}',
-        databaseURL: 'https://${serviceAccount.project_id}.firebaseio.com'
+        apiKey: '${config.firebase.apiKey}'
       };
       var app = firebase.initializeApp(config);
       app.auth().signInWithCustomToken(token).then(function() {
