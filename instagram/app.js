@@ -58,6 +58,7 @@ const OAUTH_SCOPES = 'basic';
 
 // ExpressJS setup
 const app = express();
+app.enable('trust proxy');
 app.use(express.static('public'));
 app.use(express.static('node_modules/instafeed.js'));
 app.use(cookieParser());

@@ -49,7 +49,7 @@ The app shows a simple
 You can deploy the sample's web app and server on App Engine Flex. For this:
  - Download and setup the [gcloud](https://cloud.google.com/sdk/) CLI.
  - Make sure Billing is enabled in your Google project and that Google Compute Instance is also enabled.
- - Run `cd server & gcloud app deploy`
+ - Run `gcloud app deploy`
 
  Your app will be available under your App Engine URL: `https://<project-id>.appspot.com`
 
