@@ -14,7 +14,7 @@ This sample shows how to Sign in Firebase using [LINE Login](https://developers.
     * Android Package Signature: The SHA1 value of your keystore, without semicolons
   * Download the LINE SDK for iOS and Android from LINE developers site and add them to your apps. The latest version of LINE SDK may have different API with that used to create the sample app, so you may need to make some changes to the sample apps. LINE SDK versions being used in building the sample apps are:
     *  iOS: **3.2.1**
-    *  Android: **3.1.20** 
+    *  Android: **3.1.21** 
   * Update your Channel ID to your apps
     * iOS: Update `<your_channel_id>` in `LineAdapter.plist`
     * Android: Update `<your_channel_id>` in `app/build.gradle` 
