@@ -18,7 +18,6 @@ package com.google.firebase.linelogindemo.util;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -27,13 +26,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.linelogindemo.R;
 
 import org.json.JSONObject;
@@ -42,15 +38,10 @@ import java.util.HashMap;
 
 import jp.line.android.sdk.LineSdkContext;
 import jp.line.android.sdk.LineSdkContextManager;
-import jp.line.android.sdk.api.ApiClient;
-import jp.line.android.sdk.api.ApiRequestFuture;
-import jp.line.android.sdk.api.ApiRequestFutureListener;
-import jp.line.android.sdk.api.FutureStatus;
 import jp.line.android.sdk.exception.LineSdkLoginException;
 import jp.line.android.sdk.login.LineAuthManager;
 import jp.line.android.sdk.login.LineLoginFuture;
 import jp.line.android.sdk.login.LineLoginFutureListener;
-import jp.line.android.sdk.model.Profile;
 
 public class LineLoginHelper {
 
@@ -65,15 +56,15 @@ public class LineLoginHelper {
                 activity.getString(R.string.validation_server_domain) + "/verifyToken";
     }
 
-    public Task<FirebaseUser> startLineLogin() {
+    public Task<AuthResult> startLineLogin() {
 
         /**
-         * Use Tasks API to chain 4 login steps together
+         * Use Tasks API to chain 3 login steps together
          * Refer to this blog post for more details about Tasks API:
          *   https://firebase.googleblog.com/2016/09/become-a-firebase-taskmaster-part-1.html
         **/
 
-        Task<FirebaseUser> combinedTask =
+        Task<AuthResult> combinedTask =
                 // STEP 1: User logins with LINE and get their LINE access token
                 getLineAccessCode(mActivity)
                 .continueWithTask(new Continuation<String, Task<String>>() {
@@ -91,14 +82,6 @@ public class LineLoginHelper {
                         String firebaseToken = task.getResult();
                         FirebaseAuth auth = FirebaseAuth.getInstance();
                         return auth.signInWithCustomToken(firebaseToken);
-                    }
-                })
-                .continueWithTask(new Continuation<AuthResult, Task<FirebaseUser>>() {
-                    @Override
-                    public Task<FirebaseUser> then(@NonNull Task<AuthResult> task) throws Exception {
-                        // STEP 4: (Optional) Update user profile with LINE Profile
-                        FirebaseUser user = task.getResult().getUser();
-                        return updateFirebaseUserProfile(user);
                     }
                 });
 
@@ -177,52 +160,6 @@ public class LineLoginHelper {
                 responseListener, errorListener);
 
         NetworkSingleton.getInstance(context).addToRequestQueue(fbTokenRequest);
-
-        return source.getTask();
-    }
-
-    private Task<FirebaseUser> updateFirebaseUserProfile(final FirebaseUser user) {
-        final TaskCompletionSource<FirebaseUser> source = new TaskCompletionSource<>();
-
-        // Check if we should use LINE profile to update Firebase profile
-        boolean isProfileNeedUpdate = (user.getDisplayName() == null) || (user.getPhotoUrl() == null);
-        if (!isProfileNeedUpdate) {
-            // Return the current user immediately
-            source.setResult(user);
-            return source.getTask();
-        }
-
-        // STEP 4: (Optional) Update user profile with LINE Profile
-        ApiClient apiClient = LineSdkContextManager.getSdkContext().getApiClient();
-        apiClient.getMyProfile(new ApiRequestFutureListener<Profile>() {
-            @Override
-            public void requestComplete(ApiRequestFuture<Profile> future) {
-                if (future.getStatus() != FutureStatus.SUCCESS) {
-                    // As updating user profile is an optional step, return the user regardless of the result
-                    source.setResult(user);
-                    return;
-                }
-
-                // Get LINE Profile
-                Profile profile = future.getResponseObject();
-                String displayName = profile.displayName;
-                String pictureUrl = profile.pictureUrl;
-
-                // Update Firebase profile
-                UserProfileChangeRequest changeRequest =
-                        new UserProfileChangeRequest.Builder()
-                                .setDisplayName(displayName)
-                                .setPhotoUri(Uri.parse(pictureUrl))
-                                .build();
-                user.updateProfile(changeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // As updating user profile is an optional step, return the user regardless of the result
-                        source.setResult(user);
-                    }
-                });
-            }
-        });
 
         return source.getTask();
     }

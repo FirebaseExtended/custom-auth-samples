@@ -30,6 +30,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.linelogindemo.R;
@@ -95,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
         // Kick start login progress
         mLineLoginHelper
                 .startLineLogin()
-                .addOnCompleteListener(new OnCompleteListener<FirebaseUser>() {
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<FirebaseUser> task) {
+                    public void onComplete(@NonNull Task<AuthResult> task) {
                         updateUI();
                         mLoadingDialog.dismiss();
                         mLoadingDialog = null;

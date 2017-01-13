@@ -142,49 +142,9 @@
 - (void)authenticateWithFirebaseToken:(NSString *)firebaseToken {
     // STEP 3: Login to Firebase using Firebase Custom Auth token
     [[FIRAuth auth] signInWithCustomToken:firebaseToken completion:^(FIRUser * _Nullable user, NSError * _Nullable error) {
-        if (error) {
-            [self returnSignInResult:nil error:error];
-            return;
-        }
-        
-        // Try to update
-        [self updateUserProfile:user];
+        [self returnSignInResult:user error:error];
     }];
 }
-
-#pragma mark - Step 4: (Optional) Update user profile with LINE Profile
-- (void)updateUserProfile:(FIRUser *)user {
-    BOOL isProfileNeededUpdate = (user.displayName.length == 0) || (user.photoURL.absoluteString.length == 0);
-    if (!isProfileNeededUpdate) {
-        [self returnSignInResult:user error:nil];
-    }
-    
-    // STEP 4: (Optional) Update user profile with LINE Profile
-    __weak typeof(self) wSelf = self;
-    [self.lineAdapter.getLineApiClient getMyProfileWithResultBlock:^(NSDictionary *aResult, NSError *aError) {
-        if (aError) {
-            // As this step is optional in this sample, we don't return the error to the view controller
-            [wSelf returnSignInResult:user error:nil];
-            return;
-        }
-        
-        // Update Firebase profile with LINE profile
-        FIRUserProfileChangeRequest *request = user.profileChangeRequest;
-        request.displayName = aResult[@"displayName"];
-        if (aResult[@"pictureUrl"]) {
-            request.photoURL = [NSURL URLWithString:aResult[@"pictureUrl"]];
-        }
-        [request commitChangesWithCompletion:^(NSError * _Nullable error) {
-            if (error) {
-                // Handle error here
-            }
-            
-            // As this step is optional in this sample, we don't return the error to the view controller
-            [wSelf returnSignInResult:user error:nil];
-        }];
-    }];
-}
-
 
 #pragma mark - Sign out
 - (void)signOut {
