@@ -54,33 +54,25 @@ function getFirebaseUser(lineMid, lineAccessToken) {
   // LINE's get user profile API endpoint
   const getProfileOptions = generateLineApiRequest('https://api.line.me/v1/profile', lineAccessToken);
 
-  return new Promise(function (fulfill, reject){
-    // Check if corresponding Firebase user already existed
-    admin.auth().getUser(firebaseUid)
-      .then(userRecord => fulfill(userRecord))
-      .catch(error => {
-        // If user does not exist, fetch LINE profile and create a Firebase new user with it
-        if (error.code === 'auth/user-not-found') {
-          return rp(getProfileOptions)
-            .then(response => {
-              // Parse user profile from LINE's get user profile API response
-              const displayName = response.displayName;
-              const photoURL = response.pictureUrl;
-
-              // Create a new Firebase user with LINE profile and return it
-              return admin.auth().createUser({
-                uid: firebaseUid,
-                displayName: displayName,
-                photoURL: photoURL
-              });
-            })
-            .then(userRecord => fulfill(userRecord))
-            .catch(error => reject(error));
-          }
-
-        // If error other than auth/user-not-found occurred, fail the whole login process
-        return reject(error);
+  return admin.auth().getUser(firebaseUid).catch(error => {
+    // If user does not exist, fetch LINE profile and create a Firebase new user with it
+    if (error.code === 'auth/user-not-found') {
+      return rp(getProfileOptions).then(response => {
+        // Parse user profile from LINE's get user profile API response
+        const displayName = response.displayName;
+        const photoURL = response.pictureUrl;
+   
+        console.log('Create new Firebase user for LINE user mid = "', lineMid,'"');
+        // Create a new Firebase user with LINE profile and return it
+        return admin.auth().createUser({
+          uid: firebaseUid,
+          displayName: displayName,
+          photoURL: photoURL
+        });
       });
+    }
+    // If error other than auth/user-not-found occurred, fail the whole login process
+    throw error;
   });
 }
 
