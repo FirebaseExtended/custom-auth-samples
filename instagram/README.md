@@ -1,6 +1,6 @@
 # Use Instagram Sign In with Firebase
 
-This sample shows how to Sign in Firebase using [Instagram](https://www.instagram.com/developer/).
+This sample shows how to Sign in Firebase using [Instagram](https://www.instagram.com/developer/) on the Web.
 
 You can try this sample at: [instagram-auth.appspot.com](https://instagram-auth.appspot.com).
 
