@@ -14,7 +14,7 @@ This sample shows how to Sign in Firebase using [Kakao Login](https://developers
   * Import Kakao SDK for Android by adding the following line to your app module's build.gradle file.
     *  compile group: 'com.kakao.sdk', name: 'usermgmt', version: '1.1.33' // The version may be updated
   * Update your Native app key to your apps
-    * Android: Update meta-data with key com.kakao.sdk.AppKey to your native app key in `app/build.gradle`
+    * Android: Update meta-data with key com.kakao.sdk.AppKey to your native app key in 'AndroidManifest.xml'
 
 ### Firebase app creation and setup
 
@@ -36,7 +36,7 @@ Before running your iOS and Android sample app, you need to start the sample ser
 You can run it locally by running `npm install && node app.js` in a console.
 
 Then update your Android app with the address of your local machine:
- * Android: In `configs.xml`, replace the placeholder text with your local server domain.
+ * Android: In `configs.xml`, replace the placeholder text for 'validation_server_domain' with your local server domain.
 
 As your Android sample app will access the server from a real device or a simulator, make sure that you use the network address of your local server, not `http://localhost:8080`.
 

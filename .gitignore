@@ -8,4 +8,14 @@ kakao/KakaoLoginAndroid/.gradle/
 service-account.json
 digits/android/build
 digits/android/app/build
+
+# copied from https://github.com/firebase/quickstart-android/blob/master/.gitignore
+.gradle
+local.properties
 .idea
+build/
+.DS_Store
+*.iml
+*.apk
+*.aar
+*.zip

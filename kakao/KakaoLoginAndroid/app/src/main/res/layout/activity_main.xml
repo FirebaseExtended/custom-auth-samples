@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/profile_picture"/>
 
-            <com.android.volley.toolbox.NetworkImageView
+            <ImageView
                 android:id="@+id/profile_image_view"
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"

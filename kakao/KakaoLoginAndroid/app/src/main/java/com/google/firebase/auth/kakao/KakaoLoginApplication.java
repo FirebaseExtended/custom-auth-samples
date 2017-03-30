@@ -7,7 +7,6 @@ import com.google.firebase.FirebaseApp;
 import com.kakao.auth.IApplicationConfig;
 import com.kakao.auth.KakaoAdapter;
 import com.kakao.auth.KakaoSDK;
-import com.kakao.util.helper.log.Logger;
 
 /**
  * @author kevin.kang

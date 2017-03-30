@@ -2,25 +2,24 @@ package com.google.firebase.auth.kakao;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -35,7 +34,6 @@ import com.kakao.usermgmt.LoginButton;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import com.kakao.util.exception.KakaoException;
-import com.kakao.util.helper.log.Logger;
 
 import android.os.Handler;
 import android.widget.Toast;
@@ -47,21 +45,19 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getName();
+
     LinearLayout loggedInView;
     LoginButton loginButton;
     Button logoutButton;
-    NetworkImageView imageView;
+    ImageView imageView;
 
     ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initUI();
-        Session.getCurrentSession().addCallback(new KakaoSessionCallback());
-    }
 
-    private void initUI() {
         setContentView(R.layout.activity_main);
         Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
@@ -70,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         loggedInView = (LinearLayout) findViewById(R.id.logged_in_view);
         loginButton = (LoginButton) findViewById(R.id.login_button);
         logoutButton = (Button) findViewById(R.id.logout_button);
-        imageView = (NetworkImageView) findViewById(R.id.profile_image_view);
+        imageView = (ImageView) findViewById(R.id.profile_image_view);
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +87,13 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        Session.getCurrentSession().addCallback(new KakaoSessionCallback());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         updateUI();
     }
 
@@ -102,18 +105,9 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser != null) {
             binding.setCurrentUser(currentUser);
             if (currentUser.getPhotoUrl() != null) {
-                imageView.setImageUrl(currentUser.getPhotoUrl().toString(), new ImageLoader(Volley.newRequestQueue(getApplicationContext()), new ImageLoader.ImageCache() {
-                    private final LruCache<String, Bitmap> cache = new LruCache<String, Bitmap>(20);
-                    @Override
-                    public Bitmap getBitmap(String url) {
-                        return cache.get(url);
-                    }
-
-                    @Override
-                    public void putBitmap(String url, Bitmap bitmap) {
-                        cache.put(url, bitmap);
-                    }
-                }));
+                Glide.with(this)
+                        .load(currentUser.getPhotoUrl())
+                        .into(imageView);
             }
             loginButton.setVisibility(View.INVISIBLE);
             loggedInView.setVisibility(View.VISIBLE);
@@ -161,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Logger.e(error.toString());
+                Log.e(TAG, error.toString());
                 source.setException(error);
             }
         }) {
@@ -200,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(getApplicationContext(), "Failed to create a Firebase user.", Toast.LENGTH_LONG).show();
                         if (task.getException() != null) {
-                            Logger.e(task.getException().toString());
+                            Log.e(TAG, task.getException().toString());
                         }
                     }
                 }
@@ -210,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSessionOpenFailed(KakaoException exception) {
             if (exception != null) {
-                Logger.e(exception.toString());
+                Log.e(TAG, exception.toString());
             }
         }
     }
