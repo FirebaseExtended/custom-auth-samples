@@ -59,13 +59,6 @@ function updateOrCreateUser(userId, email, displayName, photoURL) {
   return firebaseAdmin.auth().updateUser(userId, updateParams)
   .catch((error) => {
     if (error.code === 'auth/user-not-found') {
-      // const createUserParams = {
-      //   provider: 'KAKAO',
-      //   uid: userId,
-      //   email: 'hara0115@gmail.com',
-      //   displayName: displayName,
-      //   photoURL: photoURL,
-      // };
       updateParams['uid'] = userId;
       if (email) {
         updateParams['email'] = email;
