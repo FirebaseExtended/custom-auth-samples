@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="validation_server_domain">put your validation server domain here.</string>
+</resources>
