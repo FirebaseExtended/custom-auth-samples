@@ -15,7 +15,6 @@
   "author": "Google Inc.",
   "dependencies": {
     "cookie-parser": "^1.4.3",
-    "crypto": "0.0.3",
     "express": "^4.14.0",
     "firebase-admin": "^4.0.0",
     "instafeed.js": "^1.4.1",
