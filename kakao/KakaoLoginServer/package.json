@@ -13,7 +13,8 @@
     "deploy": "gcloud app deploy"
   },
   "dependencies": {
-    "firebase-admin": "^4.0.0",
+    "firebase-admin": "5.2.1",
+    "firebase-functions": "^0.5.3",
     "request-promise": "^4.1.1",
     "request": "^2.34",
     "express": "^4.14.0",

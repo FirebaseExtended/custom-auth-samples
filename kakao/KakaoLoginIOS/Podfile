@@ -1,0 +1,7 @@
+platform :ios, '10.3'
+use_frameworks!
+
+target 'KakaoLoginIOS' do
+  pod 'Firebase/Auth'
+  pod 'SDWebImage'
+end

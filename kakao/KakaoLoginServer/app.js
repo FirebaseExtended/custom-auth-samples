@@ -106,7 +106,7 @@ app.get('/', (req, res) => res.status(200)
 // actual endpoint that creates a firebase token with Kakao access token
 app.post('/verifyToken', (req, res) => {
   const token = req.body.token;
-  if (!token) return res.status(400)
+  if (!token) return res.status(400).send({error: 'There is no token.'})
   .send({message: 'Access token is a required parameter.'});
 
   createFirebaseToken(token).then((firebaseToken) => {
