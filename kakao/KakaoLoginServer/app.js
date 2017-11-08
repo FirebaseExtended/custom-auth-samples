@@ -12,7 +12,7 @@ const firebaseAdmin = require('firebase-admin');
 const serviceAccount = require('./service-account.json');
 
 // Kakao API request url to retrieve user profile based on access token
-const requestMeUrl = 'https://kapi.kakao.com/v1/user/me';
+const requestMeUrl = 'https://kapi.kakao.com/v1/user/me?secure_resource=true';
 
 // Initialize FirebaseApp with service-account.json
 firebaseAdmin.initializeApp({
@@ -51,11 +51,16 @@ function updateOrCreateUser(userId, email, displayName, photoURL) {
   const updateParams = {
     provider: 'KAKAO',
     displayName: displayName,
-    photoURL: photoURL,
   };
+  if (displayName) {
+    updateParams['displayName'] = displayName;
+  } else {
+    updateParams['displayName'] = email;
+  }
   if (photoURL) {
     updateParams['photoURL'] = photoURL;
   }
+  console.log(updateParams);
   return firebaseAdmin.auth().updateUser(userId, updateParams)
   .catch((error) => {
     if (error.code === 'auth/user-not-found') {
@@ -79,13 +84,19 @@ function updateOrCreateUser(userId, email, displayName, photoURL) {
 function createFirebaseToken(kakaoAccessToken) {
   return requestMe(kakaoAccessToken).then((response) => {
     const body = JSON.parse(response);
+    console.log(body);
     const userId = `kakao:${body.id}`;
     if (!userId) {
       return res.status(404)
       .send({message: 'There was no user with the given access token.'});
     }
-    return updateOrCreateUser(userId, body.kaccount_email,
-    body.properties.nickname, body.properties.profile_image);
+    var nickname = null;
+    var profileImage = null;
+    if (body.properties) {
+      nickname = body.properties.nickname;
+      profileImage = body.properties.profile_image;
+    }
+    return updateOrCreateUser(userId, body.kaccount_email, nickname, profileImage);
   }).then((userRecord) => {
     const userId = userRecord.uid;
     console.log(`creating a custom firebase token based on uid ${userId}`);
@@ -108,6 +119,8 @@ app.post('/verifyToken', (req, res) => {
   const token = req.body.token;
   if (!token) return res.status(400).send({error: 'There is no token.'})
   .send({message: 'Access token is a required parameter.'});
+
+  console.log(`Verifying Kakao token: ${token}`);
 
   createFirebaseToken(token).then((firebaseToken) => {
     console.log(`Returning firebase token to user: ${firebaseToken}`);
