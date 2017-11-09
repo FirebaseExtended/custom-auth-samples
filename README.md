@@ -5,7 +5,7 @@ We currently have the following samples:
 
  - [Instagram](instagram) for Web
  - [LINE Login](Line) for iOS & Android
- - [Kakao Login](kakao) for Android
+ - [Kakao Login](kakao) for iOS & Android
 
 
 ## Contributing
