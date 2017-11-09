@@ -235,7 +235,6 @@
 				TargetAttributes = {
 					7B6F23D61F6B802900BF2179 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = 4V5SU2T8JK;
 						ProvisioningStyle = Automatic;
 					};
 					7B6F23EA1F6B802900BF2179 = {
@@ -526,7 +525,6 @@
 			baseConfigurationReference = C9D9564E204934242F23187D /* Pods-KakaoLoginIOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 4V5SU2T8JK;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -549,7 +547,6 @@
 			baseConfigurationReference = C3790240A05544D4D379E154 /* Pods-KakaoLoginIOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 4V5SU2T8JK;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

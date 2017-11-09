@@ -13,12 +13,13 @@
     "deploy": "gcloud app deploy"
   },
   "dependencies": {
-    "firebase-admin": "5.2.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "firebase-admin": "^5.2.1",
     "firebase-functions": "^0.5.3",
-    "request-promise": "^4.1.1",
-    "request": "^2.34",
-    "express": "^4.14.0",
-    "body-parser": "^1.15.0"
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "service-account": "^1.0.2"
   },
   "devDependencies": {
     "eslint": "^3.17.0",
