@@ -4,4 +4,5 @@ use_frameworks!
 target 'KakaoLoginIOS' do
   pod 'Firebase/Auth'
   pod 'SDWebImage'
+  pod 'KakaoOpenSDK/KakaoOpenSDK'
 end
