@@ -90,13 +90,14 @@ function createFirebaseToken(kakaoAccessToken) {
       return res.status(404)
       .send({message: 'There was no user with the given access token.'});
     }
-    var nickname = null;
-    var profileImage = null;
+    let nickname = null;
+    let profileImage = null;
     if (body.properties) {
       nickname = body.properties.nickname;
       profileImage = body.properties.profile_image;
     }
-    return updateOrCreateUser(userId, body.kaccount_email, nickname, profileImage);
+    return updateOrCreateUser(userId, body.kaccount_email, nickname,
+      profileImage);
   }).then((userRecord) => {
     const userId = userRecord.uid;
     console.log(`creating a custom firebase token based on uid ${userId}`);
