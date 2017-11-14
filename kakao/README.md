@@ -6,7 +6,7 @@ This sample shows how to Sign in Firebase using [Kakao Login](https://developers
 
 ### Kakao app creation and setup
 
- 1. Follow the instruction in [Kakao Developers Doc](https://developers.kakao.com/docs/android#getting-started-create-app) to setup a Kakao developer account and your application.
+ 1. Follow the instruction in Kakao Developers Doc ([Android](https://developers.kakao.com/docs/android#getting-started-create-app), [iOS](https://developers.kakao.com/docs/ios#앱-생성)) to setup a Kakao developer account and your application.
  1. After finished setting up your application, follow the document to integrate Kakao SDK in your [Android](https://developers.kakao.com/docs/android) app. It should include:
   * Open **Settings -> General** page of your Kakao application, and create Android platform:
     * Android Package Name: `com.google.firebase.auth.kakao`

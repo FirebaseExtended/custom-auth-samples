@@ -1,10 +1,18 @@
-//
-//  ViewController.swift
-//  KakaoLoginIOS
-//
-//  Created by Kevin Kang on 2017. 9. 15..
-//  Copyright © 2017년 Hara Kang. All rights reserved.
-//
+/**
+ * Copyright 2017 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import UIKit
 import FirebaseAuth
@@ -13,25 +21,13 @@ import SDWebImage
 class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         if Auth.auth().currentUser == nil {
             if KOSession.shared().isOpen() {
                 requestFirebaseJwt(accessToken: KOSession.shared().accessToken)
             }
         } else {
-            self .performSegue(withIdentifier: "loginSegue", sender: self)
-            
+            self.performSegue(withIdentifier: "loginSegue", sender: self)
         }
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
     @IBAction func loginButtonClicked(_ sender: UIButton) {
@@ -40,7 +36,7 @@ class ViewController: UIViewController {
             if KOSession.shared().isOpen() {
                 self.requestFirebaseJwt(accessToken: KOSession.shared().accessToken)
             } else {
-                print("login failed")
+                print("login failed: \(error!)")
             }
         }
     }
@@ -49,7 +45,7 @@ class ViewController: UIViewController {
         Request firebase token from the validation server.
     */
     func requestFirebaseJwt(accessToken: String) {
-        let url = URL(string: String.init(format: "%@/verifyToken", Bundle.main.object(forInfoDictionaryKey: "VALIDATION_SERVER_DOMAIN") as! String))!
+        let url = URL(string: String(format: "%@/verifyToken", Bundle.main.object(forInfoDictionaryKey: "VALIDATION_SERVER_URL") as! String))!
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -63,17 +59,20 @@ class ViewController: UIViewController {
             let jsonParams = try JSONSerialization.data(withJSONObject: parameters, options: [])
             urlRequest.httpBody = jsonParams
         } catch {
-            print("Error in adding token as a parameter")
+            print("Error in adding token as a parameter: \(error)")
         }
         
         URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
-            guard let data = data, error == nil else { return }
+            guard let data = data, error == nil else {
+                print("Error in request token verifying: \(error!)")
+                return
+            }
             do {
                 let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as! [String: String]
                 let firebaseToken = jsonResponse["firebase_token"]!
                 self.signInToFirebaseWithToken(firebaseToken: firebaseToken)
-            } catch let error as NSError {
-                print(error)
+            } catch let error {
+                print("Error in parsing token: \(error)")
             }
         
         }.resume()
@@ -86,11 +85,11 @@ class ViewController: UIViewController {
     */
     func signInToFirebaseWithToken(firebaseToken: String) {
         Auth.auth().signIn(withCustomToken: firebaseToken) { (user, error) in
-            if error != nil {
-                print(error!)
-                return
+            if let authError = error {
+                print(authError)
+            } else {
+                self.performSegue(withIdentifier: "loginSegue", sender: self)
             }
-            self.performSegue(withIdentifier: "loginSegue", sender: self)
         }
     }
 }

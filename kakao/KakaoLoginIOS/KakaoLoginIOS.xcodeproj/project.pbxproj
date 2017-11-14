@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7B19A8AF1F6BAB710080347E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7B19A8AE1F6BAB710080347E /* GoogleService-Info.plist */; };
-		7B19A8B21F6BD8060080347E /* KakaoOpenSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B19A8B11F6BD8060080347E /* KakaoOpenSDK.framework */; };
 		7B5CAE801F6F9C2900A2FAD1 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5CAE7F1F6F9C2900A2FAD1 /* MainViewController.swift */; };
 		7B5CAE821F6FA07500A2FAD1 /* placeholder.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B5CAE811F6FA07500A2FAD1 /* placeholder.png */; };
 		7B6F23DB1F6B802900BF2179 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6F23DA1F6B802900BF2179 /* AppDelegate.swift */; };
@@ -42,7 +41,6 @@
 		2103FBF6149B2A7252583122 /* Pods_KakaoLoginIOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KakaoLoginIOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B19A8AE1F6BAB710080347E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7B19A8B01F6BB8080080347E /* KakaoLoginIOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KakaoLoginIOS-Bridging-Header.h"; sourceTree = "<group>"; };
-		7B19A8B11F6BD8060080347E /* KakaoOpenSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KakaoOpenSDK.framework; sourceTree = "<group>"; };
 		7B5CAE7F1F6F9C2900A2FAD1 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		7B5CAE811F6FA07500A2FAD1 /* placeholder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = placeholder.png; sourceTree = "<group>"; };
 		7B6F23D71F6B802900BF2179 /* KakaoLoginIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KakaoLoginIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,7 +66,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D474C17BAACBB4F5E75D0C20 /* Pods_KakaoLoginIOS.framework in Frameworks */,
-				7B19A8B21F6BD8060080347E /* KakaoOpenSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,7 +155,6 @@
 		88342D35A9037D1885EA8BD0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7B19A8B11F6BD8060080347E /* KakaoOpenSDK.framework */,
 				2103FBF6149B2A7252583122 /* Pods_KakaoLoginIOS.framework */,
 			);
 			name = Frameworks;

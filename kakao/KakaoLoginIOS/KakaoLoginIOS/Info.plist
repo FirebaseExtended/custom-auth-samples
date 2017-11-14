@@ -60,7 +60,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>VALIDATION_SERVER_DOMAIN</key>
+	<key>VALIDATION_SERVER_URL</key>
 	<string>put your validation server domain here</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
