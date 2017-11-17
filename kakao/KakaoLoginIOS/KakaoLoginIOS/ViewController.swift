@@ -19,8 +19,9 @@ import FirebaseAuth
 import SDWebImage
 
 class ViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         if Auth.auth().currentUser == nil {
             if KOSession.shared().isOpen() {
                 requestFirebaseJwt(accessToken: KOSession.shared().accessToken)
