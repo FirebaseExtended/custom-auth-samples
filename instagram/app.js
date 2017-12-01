@@ -48,6 +48,7 @@ const oauth2 = require('simple-oauth2').create(credentials);
 const OAUTH_REDIRECT_PATH = '/redirect';
 const OAUTH_CALLBACK_PATH = '/instagram-callback';
 const OAUTH_MOBILE_REDIRECT_PATH = '/instagram-mobile-redirect';
+const OAUTH_MOBILE_CALLBACK_PATH = '/instagram-mobile-callback';
 const OAUTH_CODE_EXCHANGE_PATH = '/instagram-mobile-exchange-code';
 
 // Custom URI scheme for Android and iOS apps.
