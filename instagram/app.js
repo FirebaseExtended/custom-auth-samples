@@ -47,7 +47,7 @@ const oauth2 = require('simple-oauth2').create(credentials);
 // Path to the OAuth handlers.
 const OAUTH_REDIRECT_PATH = '/redirect';
 const OAUTH_CALLBACK_PATH = '/instagram-callback';
-const OAUTH_MOBILE_CALLBACK_PATH = '/instagram-mobile-callback';
+const OAUTH_MOBILE_REDIRECT_PATH = '/instagram-mobile-redirect';
 const OAUTH_CODE_EXCHANGE_PATH = '/instagram-mobile-exchange-code';
 
 // Custom URI scheme for Android and iOS apps.
@@ -121,7 +121,7 @@ app.get(OAUTH_CALLBACK_PATH, (req, res) => {
  * case App Link/Universal Links are not supported on the device.
  * Native Mobile apps should use this callback.
  */
-app.get(OAUTH_MOBILE_CALLBACK_PATH, (req, res) => {
+app.get(OAUTH_MOBILE_REDIRECT_PATH, (req, res) => {
   res.redirect(`${APP_CUSTOM_SCHEME}:/${OAUTH_MOBILE_CALLBACK_PATH}?${req.originalUrl.split('?')[1]}`);
 });
 
