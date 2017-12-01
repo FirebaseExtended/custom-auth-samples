@@ -127,8 +127,7 @@ app.get(OAUTH_MOBILE_REDIRECT_PATH, (req, res) => {
 });
 
 /**
- * Exchanges a given Instagram auth code passed in the 'code' URL query parameter for a Firebase auth token and returns
- * a Firebase Custom Auth token, Instagram access token and user identity as a JSON object.
+ * Exchanges a given Instagram auth code passed in the 'code' URL query parameter for a Firebase auth token.
  * This endpoint is meant to be used by native mobile clients only since no Session Fixation attacks checks are done.
  */
 app.get(OAUTH_CODE_EXCHANGE_PATH, (req, res) => {
@@ -143,7 +142,7 @@ app.get(OAUTH_CODE_EXCHANGE_PATH, (req, res) => {
     createFirebaseAccount(results.user.id, results.user.full_name,
         results.user.profile_picture, firebaseToken).then(firebaseToken => {
       // Send the custom token, access token and profile data as a JSON object.
-      res.send(firebaseToken);
+      res.send({firebaseToken: );
     });
   });
 });
