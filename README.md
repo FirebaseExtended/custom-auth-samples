@@ -7,6 +7,7 @@ We currently have the following samples:
  - [LINE Login](Line) for iOS & Android
  - [Kakao Login](kakao) for iOS & Android
 
+You can find [additional examples for Web](https://github.com/firebase/functions-samples#authorize-with-linkedin-spotify-instagram-line-or-basic-auth) in another repository.
 
 ## Contributing
 
