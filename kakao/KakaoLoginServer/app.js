@@ -13,6 +13,8 @@ const serviceAccount = require('./service-account.json');
 
 // Kakao API request url to retrieve user profile based on access token
 const requestMeUrl = 'https://kapi.kakao.com/v1/user/me?secure_resource=true';
+const accessTokenInfoUrl = 'https://kapi.kakao.com/v1/user/access_token_info';
+const kakaoAppId = 0; // put your kakao app id here
 
 // Initialize FirebaseApp with service-account.json
 firebaseAdmin.initializeApp({
@@ -24,7 +26,7 @@ firebaseAdmin.initializeApp({
  * requestMe - Returns user profile from Kakao API
  *
  * @param  {String} kakaoAccessToken Access token retrieved by Kakao Login API
- * @return {Promiise<Response>}      User profile response in a promise
+ * @return {Promise<Response>}      User profile response in a promise
  */
 function requestMe(kakaoAccessToken) {
   console.log('Requesting user profile from Kakao API server.');
@@ -33,7 +35,23 @@ function requestMe(kakaoAccessToken) {
     headers: {'Authorization': 'Bearer ' + kakaoAccessToken},
     url: requestMeUrl,
   });
-};
+}
+
+/**
+ * validateToken - Returns access token info from Kakao API,
+ * which checks if this token is issued by this application.
+ *
+ * @param {String} kakaoAccessToken Access token retrieved by Kakao Login API
+ * @return {Promise<Response>}      Access token info response
+ */
+function validateToken(kakaoAccessToken) {
+  console.log('Validating access token from Kakao API server.');
+  return request({
+      method: 'GET',
+      headers: {'Authorization': 'Bearer ' + kakaoAccessToken},
+      url: accessTokenInfoUrl,
+  });
+}
 
 
 /**
@@ -44,7 +62,7 @@ function requestMe(kakaoAccessToken) {
  * @param  {String} email         user's email address
  * @param  {String} displayName   user
  * @param  {String} photoURL      profile photo url
- * @return {Prommise<UserRecord>} Firebase user record in a promise
+ * @return {Promise<UserRecord>} Firebase user record in a promise
  */
 function updateOrCreateUser(userId, email, displayName, photoURL) {
   console.log('updating or creating a firebase user');
@@ -72,8 +90,7 @@ function updateOrCreateUser(userId, email, displayName, photoURL) {
     }
     throw error;
   });
-};
-
+}
 
 /**
  * createFirebaseToken - returns Firebase token using Firebase Admin SDK
@@ -82,7 +99,17 @@ function updateOrCreateUser(userId, email, displayName, photoURL) {
  * @return {Promise<String>}                  Firebase token in a promise
  */
 function createFirebaseToken(kakaoAccessToken) {
-  return requestMe(kakaoAccessToken).then((response) => {
+  return validateToken(kakaoAccessToken).then((response) => {
+      const body = JSON.parse(response);
+      const appId = body.appId;
+      if (appId !== kakaoAppId) {
+          return res.status(401)
+              .send({message:
+                  'The given token does not belong to this application.',
+              });
+      }
+      return requestMe(kakaoAccessToken);
+  }).then((response) => {
     const body = JSON.parse(response);
     console.log(body);
     const userId = `kakao:${body.id}`;
@@ -103,7 +130,7 @@ function createFirebaseToken(kakaoAccessToken) {
     console.log(`creating a custom firebase token based on uid ${userId}`);
     return firebaseAdmin.auth().createCustomToken(userId, {provider: 'KAKAO'});
   });
-};
+}
 
 
 // create an express app and use json body parser
