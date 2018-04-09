@@ -104,7 +104,9 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             binding.setCurrentUser(currentUser);
-            if (currentUser.getPhotoUrl() != null) {
+            if (currentUser.getPhotoUrl() == null) {
+                Glide.clear(imageView);
+            } else {
                 Glide.with(this)
                         .load(currentUser.getPhotoUrl())
                         .into(imageView);

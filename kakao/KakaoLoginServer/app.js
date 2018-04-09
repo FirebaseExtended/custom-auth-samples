@@ -14,7 +14,8 @@ const serviceAccount = require('./service-account.json');
 // Kakao API request url to retrieve user profile based on access token
 const requestMeUrl = 'https://kapi.kakao.com/v1/user/me?secure_resource=true';
 const accessTokenInfoUrl = 'https://kapi.kakao.com/v1/user/access_token_info';
-const kakaoAppId = 0; // put your kakao app id here
+
+const config = require('./config.json'); // put your kakao app id in config.json
 
 // Initialize FirebaseApp with service-account.json
 firebaseAdmin.initializeApp({
@@ -55,7 +56,7 @@ function validateToken(kakaoAccessToken) {
 
 
 /**
- * updateOrCreateUser - Update Firebase user with the give email, create if
+ * updateOrCreateUser - Update Firebase user with the give email, or create if
  * none exists.
  *
  * @param  {String} userId        user id per app
@@ -65,31 +66,40 @@ function validateToken(kakaoAccessToken) {
  * @return {Promise<UserRecord>} Firebase user record in a promise
  */
 function updateOrCreateUser(userId, email, displayName, photoURL) {
-  console.log('updating or creating a firebase user');
-  const updateParams = {
-    provider: 'KAKAO',
-    displayName: displayName,
-  };
-  if (displayName) {
-    updateParams['displayName'] = displayName;
-  } else {
-    updateParams['displayName'] = email;
-  }
-  if (photoURL) {
-    updateParams['photoURL'] = photoURL;
-  }
-  console.log(updateParams);
-  return firebaseAdmin.auth().updateUser(userId, updateParams)
-  .catch((error) => {
-    if (error.code === 'auth/user-not-found') {
-      updateParams['uid'] = userId;
-      if (email) {
-        updateParams['email'] = email;
+  console.log(`fetching a firebase user by email ${email}`);
+  return firebaseAdmin.auth().getUserByEmail(email)
+    .then((userRecord) => linkUserWithKakao(userId, userRecord))
+    .catch((error) => {
+      if (error.code === 'auth/user-not-found') {
+        const params = {
+          uid: `kakao:${userId}`,
+          displayName: displayName,
+        };
+        if (email) {
+          params['email'] = email;
+        }
+        if (photoURL) {
+          params['photoURL'] = photoURL;
+        }
+        console.log(`creating a firebase user with email ${email}`);
+        return firebaseAdmin.auth().createUser(params);
       }
-      return firebaseAdmin.auth().createUser(updateParams);
-    }
-    throw error;
-  });
+      throw error;
+    });
+}
+
+/**
+ * linkUserWithKakao - Link current user record with kakao app user id.
+ *
+ * @param {String} userId
+ * @param {admin.auth.UserRecord} userRecord
+ * @return {Promise<UserRecord>}
+ */
+function linkUserWithKakao(userId, userRecord) {
+  console.log(`linking user with kakao provider with app user id ${userId}...`);
+  return firebaseAdmin.auth()
+    .setCustomUserClaims(userRecord.uid,
+      {kakaoUID: userId}).then((Void) => Promise.resolve(userRecord));
 }
 
 /**
@@ -102,20 +112,16 @@ function createFirebaseToken(kakaoAccessToken) {
   return validateToken(kakaoAccessToken).then((response) => {
       const body = JSON.parse(response);
       const appId = body.appId;
-      if (appId !== kakaoAppId) {
-          return res.status(401)
-              .send({message:
-                  'The given token does not belong to this application.',
-              });
+      if (appId !== config.kakao.appId) {
+        throw new Error('The given token does not belong to this application.');
       }
       return requestMe(kakaoAccessToken);
   }).then((response) => {
     const body = JSON.parse(response);
     console.log(body);
-    const userId = `kakao:${body.id}`;
+    const userId = body.id;
     if (!userId) {
-      return res.status(404)
-      .send({message: 'There was no user with the given access token.'});
+      throw new Error('There was no user with the given access token.');
     }
     let nickname = null;
     let profileImage = null;
@@ -153,7 +159,7 @@ app.post('/verifyToken', (req, res) => {
   createFirebaseToken(token).then((firebaseToken) => {
     console.log(`Returning firebase token to user: ${firebaseToken}`);
     res.send({firebase_token: firebaseToken});
-  });
+  }).catch((error) => res.status(401).send({message: error}));
 });
 
 // Start the server
