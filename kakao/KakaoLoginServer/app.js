@@ -56,23 +56,25 @@ function validateToken(kakaoAccessToken) {
 
 
 /**
- * updateOrCreateUser - Update Firebase user with the give email, or create if
- * none exists.
+ * createOrLinkUser - Link firebase user with given email,
+ * or create one if none exists. If email is not given,
+ * create a new user since there is no other way to map users.
+ * If email is not verified, make the user re-authenticate with other means.
  *
- * @param  {String} userId        user id per app
- * @param  {String} email         user's email address
- * @param  {String} displayName   user
- * @param  {String} photoURL      profile photo url
- * @return {Promise<UserRecord>} Firebase user record in a promise
+ * @param  {String} kakaoUserId    user id per app
+ * @param  {String} email          user's email address
+ * @param  {Boolean} emailVerified whether this email is verified or not
+ * @param  {String} displayName    user
+ * @param  {String} photoURL       profile photo url
+ * @return {Promise<UserRecord>}   Firebase user record in a promise
  */
-function updateOrCreateUser(userId, email, displayName, photoURL) {
-  console.log(`fetching a firebase user by email ${email}`);
-  return firebaseAdmin.auth().getUserByEmail(email)
-    .then((userRecord) => linkUserWithKakao(userId, userRecord))
+function createOrLinkUser(kakaoUserId, email, emailVerified, displayName,
+                            photoURL) {
+  return getUser(kakaoUserId, email, emailVerified)
     .catch((error) => {
       if (error.code === 'auth/user-not-found') {
         const params = {
-          uid: `kakao:${userId}`,
+          uid: `kakao:${kakaoUserId}`,
           displayName: displayName,
         };
         if (email) {
@@ -85,21 +87,60 @@ function updateOrCreateUser(userId, email, displayName, photoURL) {
         return firebaseAdmin.auth().createUser(params);
       }
       throw error;
+    })
+    .then((userRecord) => linkUserWithKakao(kakaoUserId, userRecord));
+}
+
+/**
+ * getUser - fetch firebase user with kakao UID first, then with email if
+ * no user found. If email is not verified, throw an error so that
+ * the user can re-authenticate.
+ *
+ * @param {String} kakaoUserId    user id per app
+ * @param {String} email          user's email address
+ * @param {Boolean} emailVerified whether this email is verified or not
+ * @return {Promise<admin.auth.UserRecord>}
+ */
+function getUser(kakaoUserId, email, emailVerified) {
+  console.log(`fetching a firebase user with uid kakao:${kakaoUserId}`);
+  return firebaseAdmin.auth().getUser(`kakao:${kakaoUserId}`)
+    .catch((error) => {
+      if (error.code !== 'auth/user-not-found') {
+        throw error;
+      }
+      if (!email) {
+        throw error; // cannot find existing accounts since there is no email.
+      }
+      console.log(`fetching a firebase user with email ${email}`);
+      return firebaseAdmin.auth().getUserByEmail(email)
+        .then((userRecord) => {
+          if (!emailVerified) {
+            throw new Error('This user should authenticate first ' +
+              'with other providers');
+          }
+          return userRecord;
+        });
     });
 }
 
 /**
- * linkUserWithKakao - Link current user record with kakao app user id.
+ * linkUserWithKakao - Link current user record with kakao UID
+ * if not linked yet.
  *
- * @param {String} userId
+ * @param {String} kakaoUserId
  * @param {admin.auth.UserRecord} userRecord
  * @return {Promise<UserRecord>}
  */
-function linkUserWithKakao(userId, userRecord) {
-  console.log(`linking user with kakao provider with app user id ${userId}...`);
+function linkUserWithKakao(kakaoUserId, userRecord) {
+  if (userRecord.customClaims &&
+    userRecord.customClaims['kakaoUID'] === kakaoUserId) {
+    console.log(`currently linked with kakao UID ${kakaoUserId}...`);
+    return Promise.resolve(userRecord);
+  }
+  console.log(`linking user with kakao UID ${kakaoUserId}...`);
   return firebaseAdmin.auth()
     .setCustomUserClaims(userRecord.uid,
-      {kakaoUID: userId}).then((Void) => Promise.resolve(userRecord));
+      {kakaoUID: kakaoUserId}).then(() => userRecord);
 }
 
 /**
@@ -129,8 +170,8 @@ function createFirebaseToken(kakaoAccessToken) {
       nickname = body.properties.nickname;
       profileImage = body.properties.profile_image;
     }
-    return updateOrCreateUser(userId, body.kaccount_email, nickname,
-      profileImage);
+    return createOrLinkUser(userId, body.kaccount_email,
+      body.kaccount_email_verified, nickname, profileImage);
   }).then((userRecord) => {
     const userId = userRecord.uid;
     console.log(`creating a custom firebase token based on uid ${userId}`);
