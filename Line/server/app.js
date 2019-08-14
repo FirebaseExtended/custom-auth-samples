@@ -30,16 +30,23 @@ admin.initializeApp({
 // Load config file
 const config = require('./config.json');
 
-// Generate a Request option to access LINE APIs
-function generateLineApiRequest(apiEndpoint, lineAccessToken) {
-  return {
-    url: apiEndpoint,
-    headers: {
-      'Authorization': `Bearer ${lineAccessToken}`
-    },
-    json: true
-  };
-}
+  // Generate a Request option to access LINE APIs
+  function generateLineApiRequest(apiEndpoint, lineAccessToken) {
+    return {
+        method: 'GET',
+      url: `${apiEndpoint}?access_token=${lineAccessToken}`,
+      json: true
+    };
+  }
+
+  function lineProfileRequest(apiEndpoint, lineAccessToken) {
+      return {
+          method: 'GET',
+          url: `${apiEndpoint}`,
+          headers: {'Authorization': `Bearer ${lineAccessToken}`},
+          json: true
+      }
+  }
 
 /**
  * Look up Firebase user based on LINE's mid. If the Firebase user does not exist,
@@ -47,33 +54,23 @@ function generateLineApiRequest(apiEndpoint, lineAccessToken) {
  *
  * @returns {Promise<UserRecord>} The Firebase user record in a promise.
  */
-function getFirebaseUser(lineMid, lineAccessToken) {
-  // Generate Firebase user's uid based on LINE's mid
-  const firebaseUid = `line:${lineMid}`;
-
-  // LINE's get user profile API endpoint
-  const getProfileOptions = generateLineApiRequest('https://api.line.me/v1/profile', lineAccessToken);
-
-  return admin.auth().getUser(firebaseUid).catch(error => {
-    // If user does not exist, fetch LINE profile and create a Firebase new user with it
-    if (error.code === 'auth/user-not-found') {
-      return rp(getProfileOptions).then(response => {
-        // Parse user profile from LINE's get user profile API response
+function getFirebaseUser(lineAccessToken) {
+const getProfileOptions = lineProfileRequest('https://api.line.me/v2/profile', lineAccessToken);
+    console.log(getProfileOptions)
+    return request(getProfileOptions).then(response => {
         const displayName = response.displayName;
-        const photoURL = response.pictureUrl;
-   
-        console.log('Create new Firebase user for LINE user mid = "', lineMid,'"');
-        // Create a new Firebase user with LINE profile and return it
-        return admin.auth().createUser({
-          uid: firebaseUid,
-          displayName: displayName,
-          photoURL: photoURL
-        });
-      });
-    }
-    // If error other than auth/user-not-found occurred, fail the whole login process
-    throw error;
-  });
+        const firebaseUid = `line:${response.userId}`;
+        return firebaseAdmin.auth().getUser(firebaseUid).catch(err => {
+            if (err.code === 'auth/user-not-found') {
+                return firebaseAdmin.auth().createUser({
+                    provider: 'LINE',
+                    uid: firebaseUid,
+                    displayName: displayName
+                })
+            }
+            throw err
+        })
+    })
 }
 
 /**
@@ -90,7 +87,7 @@ function getFirebaseUser(lineMid, lineAccessToken) {
  */
 function verifyLineToken(lineAccessToken) {
   // Send request to LINE server for access token verification
-  const verifyTokenOptions = generateLineApiRequest('https://api.line.me/v1/oauth/verify', lineAccessToken);
+  const verifyTokenOptions = generateLineApiRequest('https://api.line.me/oauth2/v2.1/verify', lineAccessToken);
   var firebaseUid = '';
 
   // STEP 1: Verify with LINE server that a LINE access token is valid
@@ -101,16 +98,15 @@ function verifyLineToken(lineAccessToken) {
       // you must not skip this step to make sure that the LINE access token is indeed
       // issued for your channel.
       //TODO: consider !== here
-      if (response.channelId != config.line.channelId)
+      if (response.client_id != config.line.channelId)
         return Promise.reject(new Error('LINE channel ID mismatched'));
 
       // STEP 2: Access token validation succeeded, so look up the corresponding Firebase user
-      const lineMid = response.mid;
-      return getFirebaseUser(lineMid, lineAccessToken);
+      return getFirebaseUser(lineAccessToken);
     })
     .then(userRecord => {
       // STEP 3: Generate Firebase Custom Auth Token
-      const tokenPromise = admin.auth().createCustomToken(userRecord.uid);
+      const tokenPromise = admin.auth().createCustomToken(userRecord.uid,{provider: 'LINE'});
       tokenPromise.then(token => {
         console.log('Created Custom token for UID "', userRecord.uid, '" Token:', token);
       });
