@@ -59,19 +59,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolBar = findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        loggedInView = (LinearLayout) findViewById(R.id.logged_in_view);
-        loginButton = (LoginButton) findViewById(R.id.login_button);
-        logoutButton = (Button) findViewById(R.id.logout_button);
-        imageView = (ImageView) findViewById(R.id.profile_image_view);
+        loggedInView = findViewById(R.id.logged_in_view);
+        loginButton = findViewById(R.id.login_button);
+        logoutButton = findViewById(R.id.logout_button);
+        imageView = findViewById(R.id.profile_image_view);
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UserManagement.requestLogout(new LogoutResponseCallback() {
+                UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
                     @Override
                     public void onCompleteLogout() {
                         FirebaseAuth.getInstance().signOut();
@@ -104,7 +104,9 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             binding.setCurrentUser(currentUser);
-            if (currentUser.getPhotoUrl() != null) {
+            if (currentUser.getPhotoUrl() == null) {
+                Glide.clear(imageView);
+            } else {
                 Glide.with(this)
                         .load(currentUser.getPhotoUrl())
                         .into(imageView);
@@ -178,10 +180,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSessionOpened() {
             Toast.makeText(getApplicationContext(), "Successfully logged in to Kakao. Now creating or updating a Firebase User.", Toast.LENGTH_LONG).show();
-            String accessToken = Session.getCurrentSession().getAccessToken();
+            String accessToken = Session.getCurrentSession().getTokenInfo().getAccessToken();
             getFirebaseJwt(accessToken).continueWithTask(new Continuation<String, Task<AuthResult>>() {
                 @Override
-                public Task<AuthResult> then(@NonNull Task<String> task) throws Exception {
+                public Task<AuthResult> then(@NonNull Task<String> task) {
                     String firebaseToken = task.getResult();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
                     return auth.signInWithCustomToken(firebaseToken);
