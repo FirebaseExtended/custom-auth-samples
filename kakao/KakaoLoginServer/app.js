@@ -12,7 +12,7 @@ const firebaseAdmin = require('firebase-admin');
 const serviceAccount = require('./service-account.json');
 
 // Kakao API request url to retrieve user profile based on access token
-const requestMeUrl = 'https://kapi.kakao.com/v1/user/me?secure_resource=true';
+const requestMeUrl = 'https://kapi.kakao.com/v2/user/me?secure_resource=true';
 
 // Initialize FirebaseApp with service-account.json
 firebaseAdmin.initializeApp({
