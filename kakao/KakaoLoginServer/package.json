@@ -22,7 +22,7 @@
     "service-account": "^1.0.2"
   },
   "devDependencies": {
-    "eslint": "^3.17.0",
+    "eslint": "^8.50.0",
     "eslint-config-google": "^0.7.1"
   }
 }
